@@ -8,7 +8,7 @@ import (
 
 // Общие константы для вычислений.
 const (
-	MInKm      = 1000 // кgtоличество метров в одном километре
+	MInKm      = 1000 // количество метров в одном километре
 	MinInHours = 60   // количество минут в одном часе
 	LenStep    = 0.65 // длина одного шага
 	CmInM      = 100  // количество сантиметров в одном метре
@@ -34,6 +34,10 @@ func (t Training) distance() float64 {
 // meanSpeed возвращает среднюю скорость бега или ходьбы (км/ч).
 func (t Training) meanSpeed() float64 {
 	// вставьте ваш код ниже
+	if t.Duration == 0 {
+		fmt.Println("Ошибка деления на ноль!")
+		return 0
+	}
 	return t.distance() / t.Duration.Hours()
 }
 
@@ -103,7 +107,7 @@ func (r Running) Calories() float64 {
 // Это переопределенный метод TrainingInfo() из Training.
 func (r Running) TrainingInfo() InfoMessage {
 	// вставьте ваш код ниже
-	return InfoMessage{TrainingType: r.TrainingType, Duration: r.Duration, Distance: r.distance(), Speed: r.meanSpeed()}
+	return r.Training.TrainingInfo()
 }
 
 // Константы для расчета потраченных килокалорий при ходьбе.
@@ -127,6 +131,10 @@ type Walking struct {
 // Это переопределенный метод Calories() из Training.
 func (w Walking) Calories() float64 {
 	// вставьте ваш код ниже
+	if w.Height == 0 {
+		fmt.Println("Ошибка деления на ноль!")
+		return 0
+	}
 	return ((CaloriesWeightMultiplier*w.Weight + (math.Pow(w.meanSpeed()*KmHInMsec, 2)/(w.Height/CmInM))*CaloriesSpeedHeightMultiplier*w.Weight) * w.Duration.Hours() * MinInHours)
 }
 
@@ -134,7 +142,7 @@ func (w Walking) Calories() float64 {
 // Это переопределенный метод TrainingInfo() из Training.
 func (w Walking) TrainingInfo() InfoMessage {
 	// вставьте ваш код ниже
-	return InfoMessage{TrainingType: w.TrainingType, Duration: w.Duration, Distance: w.distance(), Speed: w.meanSpeed()}
+	return w.Training.TrainingInfo()
 }
 
 // Константы для расчета потраченных килокалорий при плавании.
@@ -158,7 +166,11 @@ type Swimming struct {
 // Это переопределенный метод Calories() из Training.
 func (s Swimming) meanSpeed() float64 {
 	// вставьте ваш код ниже
-	return float64(s.LengthPool*s.CountPool) / float64(MInKm) / float64(s.Duration.Hours())
+	if s.Duration == 0 {
+		fmt.Println("Ошибка деления на ноль!")
+		return 0
+	}
+	return float64(s.LengthPool*s.CountPool) / MInKm / s.Duration.Hours()
 }
 
 // Calories возвращает количество калорий, потраченных при плавании.
